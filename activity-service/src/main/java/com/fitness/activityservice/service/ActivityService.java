@@ -7,6 +7,8 @@ import com.fitness.activityservice.model.Activity;
 import com.fitness.activityservice.repo.ActivityRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,6 +18,10 @@ public class ActivityService {
 
     private final ActivityRepository activityRepository;
     private final UserValidationService userValidationService;
+    private final KafkaTemplate<String, Activity>  kafkaTemplate;
+
+    @Value("${kafka.topic.name}")
+    private String topicName;
 
     public ActivityResponse trackActivity(ActivityRequest request) {
 
@@ -35,11 +41,10 @@ public class ActivityService {
 
         Activity savedActivity = activityRepository.save(activity);
 
-        // Publish to RabbitMQ for AI Processing
         try {
-//            rabbitTemplate.convertAndSend(exchange, routingKey, savedActivity);
+            kafkaTemplate.send(topicName,savedActivity.getUserId(), savedActivity);
         } catch(Exception e) {
-            log.error("Failed to publish activity to RabbitMQ : ", e);
+            log.error("Failed to publish activity to kafka : ", e);
         }
 
         return mapToResponse(savedActivity);

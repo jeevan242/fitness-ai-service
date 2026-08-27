@@ -4,10 +4,17 @@ spring:
 
   mongodb:
     uri: mongodb://admin:admin@localhost:27017/aiactivityfitness?authSource=admin
-
+  kafka:
+    bootstrap-servers: localhost:9094
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+kafka:
+  topic:
+    name: activity-events
 eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:8761/eureka/
 server:
-  port: 9092
+  port: 9002
