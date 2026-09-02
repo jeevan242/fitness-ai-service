@@ -29,5 +29,10 @@ eureka:
     serviceUrl:
       defaultZone: http://localhost:8761/eureka/
 
+gemini:
+  api:
+    url: ${GEMINI_URL}
+    key: ${GEMINI_API}
+
 server:
   port: 9093
